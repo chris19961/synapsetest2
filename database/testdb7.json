@@ -1,0 +1,22 @@
+{
+	"name": "testdb7",
+	"properties": {
+		"Name": "testdb7",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb7",
+			"Properties": {
+				"FormatType": "parquet",
+				"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+			}
+		}
+	},
+	"type": "DATABASE"
+}
