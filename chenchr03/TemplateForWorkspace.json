@@ -114,7 +114,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f8b2f44d-0b3b-4e2d-864e-3daa24e96ca0"
+						"spark.autotune.trackingId": "f7b1ce9c-0f5e-4899-80cc-e4f43566a2d7"
 					}
 				},
 				"metadata": {
@@ -139,15 +139,13 @@
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"# spark.sql(\"CREATE DATABASE IF NOT EXISTS nyctaxi\")\r\n",
 							"spark.sql(\"CREATE DATABASE IF NOT EXISTS testdb2\")"
@@ -258,6 +256,111 @@
 						],
 						"outputs": [],
 						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/test12')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "test12",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/test12",
+								"Properties": {
+									"FormatType": "parquet",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							}
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb11')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb11",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb11",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							}
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb13')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb13",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb13",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							}
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
 					}
 				]
 			},
@@ -882,76 +985,6 @@
 			},
 			"dependsOn": [],
 			"location": "westeurope"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/testdb11')]",
-			"type": "Microsoft.Synapse/workspaces/databases",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"Ddls": [
-					{
-						"ActionType": "CREATE",
-						"OldEntity": null,
-						"NewEntity": {
-							"Name": "testdb11",
-							"EntityType": "DATABASE",
-							"Origin": {
-								"Type": "SPARK"
-							},
-							"Properties": {
-								"IsSyMSCDMDatabase": true
-							},
-							"Source": {
-								"Provider": "ADLS",
-								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb11",
-								"Properties": {
-									"FormatType": "csv",
-									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
-								}
-							}
-						},
-						"Source": {
-							"Type": "SPARK"
-						}
-					}
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/test12')]",
-			"type": "Microsoft.Synapse/workspaces/databases",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"Ddls": [
-					{
-						"ActionType": "CREATE",
-						"OldEntity": null,
-						"NewEntity": {
-							"Name": "test12",
-							"EntityType": "DATABASE",
-							"Origin": {
-								"Type": "SPARK"
-							},
-							"Properties": {
-								"IsSyMSCDMDatabase": true
-							},
-							"Source": {
-								"Provider": "ADLS",
-								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/test12",
-								"Properties": {
-									"FormatType": "parquet",
-									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
-								}
-							}
-						},
-						"Source": {
-							"Type": "SPARK"
-						}
-					}
-				]
-			},
-			"dependsOn": []
 		}
 	]
 }
