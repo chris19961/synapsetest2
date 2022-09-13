@@ -114,7 +114,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "fbec442d-da9f-43ef-82bf-11c230217014"
+						"spark.autotune.trackingId": "f8b2f44d-0b3b-4e2d-864e-3daa24e96ca0"
 					}
 				},
 				"metadata": {
@@ -906,6 +906,41 @@
 								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb11",
 								"Properties": {
 									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							}
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/test12')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "test12",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/test12",
+								"Properties": {
+									"FormatType": "parquet",
 									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
 								}
 							}
