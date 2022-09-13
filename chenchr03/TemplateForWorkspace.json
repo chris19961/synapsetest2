@@ -797,6 +797,41 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/testdb9')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb9",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb9",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							}
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/sparkpool01')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
