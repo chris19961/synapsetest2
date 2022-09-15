@@ -1,0 +1,25 @@
+{
+	"name": "test12",
+	"properties": {
+		"Name": "test12",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/test12",
+			"Properties": {
+				"FormatType": "parquet",
+				"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+			}
+		},
+		"PublishStatus": "PUBLISHED",
+		"ObjectVersion": 1,
+		"ObjectId": "e3753492-bbce-408c-bd24-f5c92c13a724"
+	},
+	"type": "DATABASE"
+}

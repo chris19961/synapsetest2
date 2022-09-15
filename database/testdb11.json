@@ -1,0 +1,25 @@
+{
+	"name": "testdb11",
+	"properties": {
+		"Name": "testdb11",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb11",
+			"Properties": {
+				"FormatType": "csv",
+				"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+			}
+		},
+		"PublishStatus": "PUBLISHED",
+		"ObjectVersion": 1,
+		"ObjectId": "edd1fe39-df29-46da-9aa2-e7577b39197d"
+	},
+	"type": "DATABASE"
+}

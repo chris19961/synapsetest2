@@ -1,0 +1,25 @@
+{
+	"name": "testdb14",
+	"properties": {
+		"Name": "testdb14",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb14",
+			"Properties": {
+				"FormatType": "csv",
+				"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+			}
+		},
+		"PublishStatus": "PUBLISHED",
+		"ObjectVersion": 1,
+		"ObjectId": "f2c50627-9a81-444a-8afd-5536f596386e"
+	},
+	"type": "DATABASE"
+}

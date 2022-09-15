@@ -1,0 +1,130 @@
+{
+	"name": "AccountingBasis",
+	"properties": {
+		"Name": "AccountingBasis",
+		"EntityType": "TABLE",
+		"TableType": "EXTERNAL",
+		"Namespace": {
+			"SchemaName": null,
+			"DatabaseName": "testdb4",
+			"DatabaseId": null
+		},
+		"StorageDescriptor": {
+			"Distribution": null,
+			"Columns": [
+				{
+					"Name": "AccountingBasisId",
+					"Description": "The unique identifier of an Accounting Basis.",
+					"OriginDataTypeName": {
+						"TypeName": "integer",
+						"IsComplexType": false,
+						"IsNullable": false,
+						"Length": 0,
+						"Precision": 0,
+						"Scale": 0,
+						"Properties": {
+							"HIVE_TYPE_STRING": "integer"
+						}
+					},
+					"BaseAttributeReference": {
+						"Entity": "AccountingBasis.cdm.json/AccountingBasis",
+						"Name": "AccountingBasisId"
+					}
+				},
+				{
+					"Name": "AccountingBasisName",
+					"Description": "The name of an Accounting Basis.",
+					"OriginDataTypeName": {
+						"TypeName": "string",
+						"IsComplexType": false,
+						"IsNullable": true,
+						"Length": 128,
+						"Precision": 0,
+						"Scale": 0,
+						"Properties": {
+							"HIVE_TYPE_STRING": "string"
+						}
+					},
+					"BaseAttributeReference": {
+						"Entity": "AccountingBasis.cdm.json/AccountingBasis",
+						"Name": "AccountingBasisName"
+					}
+				},
+				{
+					"Name": "AccountingBasisDescription",
+					"Description": "The description of an Accounting Basis.",
+					"OriginDataTypeName": {
+						"TypeName": "string",
+						"IsComplexType": false,
+						"IsNullable": true,
+						"Length": 512,
+						"Precision": 0,
+						"Scale": 0,
+						"Properties": {
+							"HIVE_TYPE_STRING": "string"
+						}
+					},
+					"BaseAttributeReference": {
+						"Entity": "AccountingBasis.cdm.json/AccountingBasis",
+						"Name": "AccountingBasisDescription"
+					}
+				}
+			],
+			"ColumnSetEntityName": "8d419296-f925-4b52-8f43-2f6bed459bfd",
+			"Format": {
+				"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+				"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+				"FormatType": "parquet",
+				"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+				"Properties": {
+					"path": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb4/AccountingBasis",
+					"FormatTypeSetToDatabaseDefault": true
+				}
+			},
+			"Source": {
+				"Provider": "ADLS",
+				"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb4/AccountingBasis",
+				"Properties": {
+					"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage",
+					"LocationSetToDatabaseDefault": true
+				}
+			},
+			"Properties": {
+				"textinputformat.record.delimiter": ",",
+				"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
+				"derivedModelAttributeInfo": "{\"attributeReferences\":{\"AccountingBasisId\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisId\"},\"AccountingBasisName\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisName\"},\"AccountingBasisDescription\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisDescription\"}}}"
+			},
+			"Compressed": false,
+			"SerDeInfo": null,
+			"IsStoredAsSubdirectories": false
+		},
+		"Owner": null,
+		"CreateTime": 0,
+		"LastAccessTime": 0,
+		"Retention": 0,
+		"Temporary": false,
+		"IsRewriteEnabled": false,
+		"ViewOriginalText": null,
+		"ViewExpandedText": null,
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"OriginObjectId": null,
+		"IsSharedEntity": false,
+		"PublishStatus": "PUBLISHED",
+		"Properties": {
+			"DerivedModelEntityInfo": "{\"entityDirectives\":{\"baseEntityReference\":{\"name\":\"AccountingBasis\",\"path\":\"AccountingBasis.cdm.json/AccountingBasis\"},\"description\":\"The accounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\\n\\nEx:\\nCASH BASIS ACCOUNTING\\nRevenue is recorded only when cash is received and an expense is recorded only when cash is paid. \\n\\nMost businesses use the accrual basis, which individuals and professional people sue the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables.\\n\\nACCRUAL BASIS ACCOUNTING\\nAccounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\\n\\nMost businesses use the accrual basis, which individuals and professional people use the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables.\",\"primaryKey\":[\"AccountingBasisId\"],\"projectionInfo\":{\"attributes\":[{\"type\":\"Existing\",\"attributeReference\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisId\"},\"dataType\":\"integer\",\"description\":\"The unique identifier of an Accounting Basis.\",\"isNullable\":false,\"name\":\"AccountingBasisId\"},{\"type\":\"Existing\",\"attributeReference\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisName\"},\"dataType\":\"string\",\"dataTypeLength\":128,\"description\":\"The name of an Accounting Basis.\",\"isNullable\":true,\"name\":\"AccountingBasisName\"},{\"type\":\"Existing\",\"attributeReference\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisDescription\"},\"dataType\":\"string\",\"dataTypeLength\":512,\"description\":\"The description of an Accounting Basis.\",\"isNullable\":true,\"name\":\"AccountingBasisDescription\"}]}}}",
+			"Description": "The accounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\n\nEx:\nCASH BASIS ACCOUNTING\nRevenue is recorded only when cash is received and an expense is recorded only when cash is paid. \n\nMost businesses use the accrual basis, which individuals and professional people sue the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables.\n\nACCRUAL BASIS ACCOUNTING\nAccounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\n\nMost businesses use the accrual basis, which individuals and professional people use the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables.",
+			"DisplayFolderInfo": "{\"name\":\"Accounting & Financial Reporting\",\"colorCode\":\"#0078D4\"}",
+			"PrimaryKeys": "AccountingBasisId",
+			"spark.sql.sources.provider": "parquet",
+			"x-ms-usageinfo": "AzureSynapseDatabaseTemplate",
+			"spark.sql.sources.schema.numParts": "1",
+			"spark.sql.sources.schema.part.0": "{\"type\":\"struct\",\"fields\":[{\"name\":\"AccountingBasisId\",\"type\":\"integer\",\"nullable\":false,\"metadata\":{}},{\"name\":\"AccountingBasisName\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"AccountingBasisDescription\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}}]}"
+		},
+		"ObjectVersion": 1,
+		"ObjectId": "61ad3fab-f16e-4267-856a-2a8949a3e530",
+		"Description": "The accounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\n\nEx:\nCASH BASIS ACCOUNTING\nRevenue is recorded only when cash is received and an expense is recorded only when cash is paid. \n\nMost businesses use the accrual basis, which individuals and professional people sue the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables.\n\nACCRUAL BASIS ACCOUNTING\nAccounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\n\nMost businesses use the accrual basis, which individuals and professional people use the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables."
+	},
+	"type": "TABLE"
+}
