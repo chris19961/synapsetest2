@@ -1,0 +1,22 @@
+{
+	"name": "dup05",
+	"properties": {
+		"Name": "dup05",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/dup05",
+			"Properties": {
+				"FormatType": "parquet",
+				"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+			}
+		}
+	},
+	"type": "DATABASE"
+}

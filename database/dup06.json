@@ -1,0 +1,22 @@
+{
+	"name": "dup06",
+	"properties": {
+		"Name": "dup06",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/dup06",
+			"Properties": {
+				"FormatType": "csv",
+				"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+			}
+		}
+	},
+	"type": "DATABASE"
+}
