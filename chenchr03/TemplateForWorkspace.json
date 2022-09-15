@@ -1,0 +1,1167 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "chenchr03"
+		},
+		"chenchr03-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'chenchr03-WorkspaceDefaultSqlServer'"
+		},
+		"chenchr03-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://chenchrlake06.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/chenchr03-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('chenchr03-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/chenchr03-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('chenchr03-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create lake database')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "sparkpool01",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"runAsWorkspaceSystemIdentity": false,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "f7b1ce9c-0f5e-4899-80cc-e4f43566a2d7"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/324e16a6-e311-45e7-a120-d960a0df154a/resourceGroups/chenchrRG/providers/Microsoft.Synapse/workspaces/chenchr03/bigDataPools/sparkpool01",
+						"name": "sparkpool01",
+						"type": "Spark",
+						"endpoint": "https://chenchr03.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool01",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net",
+							"authHeader": null
+						},
+						"sparkVersion": "3.1",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"# spark.sql(\"CREATE DATABASE IF NOT EXISTS nyctaxi\")\r\n",
+							"spark.sql(\"CREATE DATABASE IF NOT EXISTS testdb2\")"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df = spark.read.load('abfss://myspace@chenchrlake06.dfs.core.windows.net/chris/trip100.csv', format='csv'\r\n",
+							", header=True\r\n",
+							")"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df.write.mode(\"overwrite\").saveAsTable(\"testdb6.trip100_2\")"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"display(spark.sql(\"select * from nyctaxi.trip100\"))"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "sparksql"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%sql\r\n",
+							"\r\n",
+							"show databases"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/test12')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "test12",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/test12",
+								"Properties": {
+									"FormatType": "parquet",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "e3753492-bbce-408c-bd24-f5c92c13a724"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb10')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb10",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb10",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "4cdb4905-4cf0-4e2a-838d-5952e777b8d6"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb11')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb11",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb11",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "edd1fe39-df29-46da-9aa2-e7577b39197d"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb13')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb13",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb13",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "081ae27c-7963-4ac1-86bd-dc0b8753009e"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb14')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb14",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb14",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "f2c50627-9a81-444a-8afd-5536f596386e"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb3')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb3",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb3",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "01a286c4-a9a8-474d-bd88-ba4ab6af12ea"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb4')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb4",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true,
+								"DerivedModelDBInfo": "{\"ModelDirectives\":{\"BaseModel\":{\"Name\":\"Agriculture\",\"Version\":\"0.1.0\"}}}",
+								"x-ms-usageinfo": "AzureSynapseDatabaseTemplate"
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb4",
+								"Properties": {
+									"FormatType": "parquet",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "e9f49d63-660b-4d9d-b796-c9e596359111"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "AccountingBasis",
+							"EntityType": "TABLE",
+							"TableType": "EXTERNAL",
+							"Namespace": {
+								"SchemaName": null,
+								"DatabaseName": "testdb4",
+								"DatabaseId": null
+							},
+							"StorageDescriptor": {
+								"Distribution": null,
+								"Columns": [
+									{
+										"Name": "AccountingBasisId",
+										"Description": "The unique identifier of an Accounting Basis.",
+										"OriginDataTypeName": {
+											"TypeName": "integer",
+											"IsComplexType": false,
+											"IsNullable": false,
+											"Length": 0,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "integer"
+											}
+										},
+										"BaseAttributeReference": {
+											"Entity": "AccountingBasis.cdm.json/AccountingBasis",
+											"Name": "AccountingBasisId"
+										}
+									},
+									{
+										"Name": "AccountingBasisName",
+										"Description": "The name of an Accounting Basis.",
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 128,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										},
+										"BaseAttributeReference": {
+											"Entity": "AccountingBasis.cdm.json/AccountingBasis",
+											"Name": "AccountingBasisName"
+										}
+									},
+									{
+										"Name": "AccountingBasisDescription",
+										"Description": "The description of an Accounting Basis.",
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 512,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										},
+										"BaseAttributeReference": {
+											"Entity": "AccountingBasis.cdm.json/AccountingBasis",
+											"Name": "AccountingBasisDescription"
+										}
+									}
+								],
+								"ColumnSetEntityName": "8d419296-f925-4b52-8f43-2f6bed459bfd",
+								"Format": {
+									"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+									"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+									"FormatType": "parquet",
+									"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+									"Properties": {
+										"path": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb4/AccountingBasis",
+										"FormatTypeSetToDatabaseDefault": true
+									}
+								},
+								"Source": {
+									"Provider": "ADLS",
+									"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb4/AccountingBasis",
+									"Properties": {
+										"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage",
+										"LocationSetToDatabaseDefault": true
+									}
+								},
+								"Properties": {
+									"textinputformat.record.delimiter": ",",
+									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
+									"derivedModelAttributeInfo": "{\"attributeReferences\":{\"AccountingBasisId\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisId\"},\"AccountingBasisName\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisName\"},\"AccountingBasisDescription\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisDescription\"}}}"
+								},
+								"Compressed": false,
+								"SerDeInfo": null,
+								"IsStoredAsSubdirectories": false
+							},
+							"Owner": null,
+							"CreateTime": 0,
+							"LastAccessTime": 0,
+							"Retention": 0,
+							"Temporary": false,
+							"IsRewriteEnabled": false,
+							"ViewOriginalText": null,
+							"ViewExpandedText": null,
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"OriginObjectId": null,
+							"IsSharedEntity": false,
+							"PublishStatus": "PUBLISHED",
+							"Properties": {
+								"DerivedModelEntityInfo": "{\"entityDirectives\":{\"baseEntityReference\":{\"name\":\"AccountingBasis\",\"path\":\"AccountingBasis.cdm.json/AccountingBasis\"},\"description\":\"The accounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\\n\\nEx:\\nCASH BASIS ACCOUNTING\\nRevenue is recorded only when cash is received and an expense is recorded only when cash is paid. \\n\\nMost businesses use the accrual basis, which individuals and professional people sue the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables.\\n\\nACCRUAL BASIS ACCOUNTING\\nAccounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\\n\\nMost businesses use the accrual basis, which individuals and professional people use the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables.\",\"primaryKey\":[\"AccountingBasisId\"],\"projectionInfo\":{\"attributes\":[{\"type\":\"Existing\",\"attributeReference\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisId\"},\"dataType\":\"integer\",\"description\":\"The unique identifier of an Accounting Basis.\",\"isNullable\":false,\"name\":\"AccountingBasisId\"},{\"type\":\"Existing\",\"attributeReference\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisName\"},\"dataType\":\"string\",\"dataTypeLength\":128,\"description\":\"The name of an Accounting Basis.\",\"isNullable\":true,\"name\":\"AccountingBasisName\"},{\"type\":\"Existing\",\"attributeReference\":{\"entity\":\"AccountingBasis.cdm.json/AccountingBasis\",\"name\":\"AccountingBasisDescription\"},\"dataType\":\"string\",\"dataTypeLength\":512,\"description\":\"The description of an Accounting Basis.\",\"isNullable\":true,\"name\":\"AccountingBasisDescription\"}]}}}",
+								"Description": "The accounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\n\nEx:\nCASH BASIS ACCOUNTING\nRevenue is recorded only when cash is received and an expense is recorded only when cash is paid. \n\nMost businesses use the accrual basis, which individuals and professional people sue the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables.\n\nACCRUAL BASIS ACCOUNTING\nAccounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\n\nMost businesses use the accrual basis, which individuals and professional people use the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables.",
+								"DisplayFolderInfo": "{\"name\":\"Accounting & Financial Reporting\",\"colorCode\":\"#0078D4\"}",
+								"PrimaryKeys": "AccountingBasisId",
+								"spark.sql.sources.provider": "parquet",
+								"x-ms-usageinfo": "AzureSynapseDatabaseTemplate",
+								"spark.sql.sources.schema.numParts": "1",
+								"spark.sql.sources.schema.part.0": "{\"type\":\"struct\",\"fields\":[{\"name\":\"AccountingBasisId\",\"type\":\"integer\",\"nullable\":false,\"metadata\":{}},{\"name\":\"AccountingBasisName\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"AccountingBasisDescription\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}}]}"
+							},
+							"ObjectVersion": 1,
+							"ObjectId": "61ad3fab-f16e-4267-856a-2a8949a3e530",
+							"Description": "The accounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\n\nEx:\nCASH BASIS ACCOUNTING\nRevenue is recorded only when cash is received and an expense is recorded only when cash is paid. \n\nMost businesses use the accrual basis, which individuals and professional people sue the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables.\n\nACCRUAL BASIS ACCOUNTING\nAccounting basis in which transactions that change a company's financial statements are recorded in the periods in which the events occur, rather than in the periods in which the company receives or pays cash.\n\nMost businesses use the accrual basis, which individuals and professional people use the cash basis.   The cash basis is not normally suitable when there are significant amounts of inventories, receivables and payables."
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb5')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb5",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb5",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "55e85856-2e11-4f34-a524-906343888ee2"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "Table_1",
+							"EntityType": "TABLE",
+							"TableType": "EXTERNAL",
+							"Namespace": {
+								"SchemaName": null,
+								"DatabaseName": "testdb5",
+								"DatabaseId": null
+							},
+							"StorageDescriptor": {
+								"Distribution": null,
+								"Columns": [
+									{
+										"Name": "Column_1",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 256,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									}
+								],
+								"ColumnSetEntityName": "6c69403f-698f-41de-8c6e-2bf8fb917cb7",
+								"Format": {
+									"InputFormat": "org.apache.hadoop.mapred.SequenceFileInputFormat",
+									"OutputFormat": "org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat",
+									"FormatType": "csv",
+									"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+									"Properties": {
+										"path": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb5/Table_1",
+										"delimiter": ",",
+										"firstRowAsHeader": "false",
+										"multiLine": "false",
+										"serialization.format": "1",
+										"escape": "\\",
+										"quote": "\"",
+										"FormatTypeSetToDatabaseDefault": true,
+										"header": "false"
+									}
+								},
+								"Source": {
+									"Provider": "ADLS",
+									"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb5/Table_1",
+									"Properties": {
+										"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage",
+										"LocationSetToDatabaseDefault": true
+									}
+								},
+								"Properties": {
+									"textinputformat.record.delimiter": ",",
+									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
+									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
+								},
+								"Compressed": false,
+								"SerDeInfo": null,
+								"IsStoredAsSubdirectories": false
+							},
+							"Owner": null,
+							"CreateTime": 0,
+							"LastAccessTime": 0,
+							"Retention": 0,
+							"Temporary": false,
+							"IsRewriteEnabled": false,
+							"ViewOriginalText": null,
+							"ViewExpandedText": null,
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"OriginObjectId": null,
+							"IsSharedEntity": false,
+							"PublishStatus": "PUBLISHED",
+							"Properties": {
+								"Description": "",
+								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
+								"PrimaryKeys": "",
+								"spark.sql.sources.provider": "csv",
+								"spark.sql.sources.schema.numParts": "1",
+								"spark.sql.sources.schema.part.0": "{\"type\":\"struct\",\"fields\":[{\"name\":\"Column_1\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}}]}"
+							},
+							"ObjectVersion": 1,
+							"ObjectId": "5fa4d9fc-723c-4b38-b51c-f3d736e03359",
+							"Description": ""
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb7')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb7",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb7",
+								"Properties": {
+									"FormatType": "parquet",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "d05369ae-ab0c-45a2-8b0e-7bda3d201d90"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "Table_1",
+							"EntityType": "TABLE",
+							"TableType": "EXTERNAL",
+							"Namespace": {
+								"SchemaName": null,
+								"DatabaseName": "testdb7",
+								"DatabaseId": null
+							},
+							"StorageDescriptor": {
+								"Distribution": null,
+								"Columns": [
+									{
+										"Name": "Column_1",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 256,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									}
+								],
+								"ColumnSetEntityName": "10135a99-a418-4e46-9691-d762ed7ef41c",
+								"Format": {
+									"InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+									"OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+									"FormatType": "parquet",
+									"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+									"Properties": {
+										"path": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb7/Table_1",
+										"FormatTypeSetToDatabaseDefault": true
+									}
+								},
+								"Source": {
+									"Provider": "ADLS",
+									"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb7/Table_1",
+									"Properties": {
+										"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage",
+										"LocationSetToDatabaseDefault": true
+									}
+								},
+								"Properties": {
+									"textinputformat.record.delimiter": ",",
+									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
+									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
+								},
+								"Compressed": false,
+								"SerDeInfo": null,
+								"IsStoredAsSubdirectories": false
+							},
+							"Owner": null,
+							"CreateTime": 0,
+							"LastAccessTime": 0,
+							"Retention": 0,
+							"Temporary": false,
+							"IsRewriteEnabled": false,
+							"ViewOriginalText": null,
+							"ViewExpandedText": null,
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"OriginObjectId": null,
+							"IsSharedEntity": false,
+							"PublishStatus": "PUBLISHED",
+							"Properties": {
+								"Description": "",
+								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
+								"PrimaryKeys": "",
+								"spark.sql.sources.provider": "parquet",
+								"spark.sql.sources.schema.numParts": "1",
+								"spark.sql.sources.schema.part.0": "{\"type\":\"struct\",\"fields\":[{\"name\":\"Column_1\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}}]}"
+							},
+							"ObjectVersion": 1,
+							"ObjectId": "275bb9b1-4a32-4dc4-a611-026c47b00d43",
+							"Description": ""
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb8')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb8",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb8",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "c90bda0d-39f2-4cf2-bacb-15b733861556"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					},
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "Table_1",
+							"EntityType": "TABLE",
+							"TableType": "EXTERNAL",
+							"Namespace": {
+								"SchemaName": null,
+								"DatabaseName": "testdb8",
+								"DatabaseId": null
+							},
+							"StorageDescriptor": {
+								"Distribution": null,
+								"Columns": [
+									{
+										"Name": "Column_1",
+										"Description": null,
+										"OriginDataTypeName": {
+											"TypeName": "string",
+											"IsComplexType": false,
+											"IsNullable": true,
+											"Length": 256,
+											"Precision": 0,
+											"Scale": 0,
+											"Properties": {
+												"HIVE_TYPE_STRING": "string"
+											}
+										}
+									}
+								],
+								"ColumnSetEntityName": "8ef5f09a-d428-44d3-ab00-439dc7991565",
+								"Format": {
+									"InputFormat": "org.apache.hadoop.mapred.SequenceFileInputFormat",
+									"OutputFormat": "org.apache.hadoop.hive.ql.io.HiveSequenceFileOutputFormat",
+									"FormatType": "csv",
+									"SerializeLib": "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
+									"Properties": {
+										"path": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb8/Table_1",
+										"delimiter": ",",
+										"firstRowAsHeader": "false",
+										"multiLine": "false",
+										"serialization.format": "1",
+										"escape": "\\",
+										"quote": "\"",
+										"FormatTypeSetToDatabaseDefault": true,
+										"header": "false"
+									}
+								},
+								"Source": {
+									"Provider": "ADLS",
+									"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb8/Table_1",
+									"Properties": {
+										"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage",
+										"LocationSetToDatabaseDefault": true
+									}
+								},
+								"Properties": {
+									"textinputformat.record.delimiter": ",",
+									"compression": "{\"type\":\"None\",\"level\":\"optimal\"}",
+									"derivedModelAttributeInfo": "{\"attributeReferences\":{}}"
+								},
+								"Compressed": false,
+								"SerDeInfo": null,
+								"IsStoredAsSubdirectories": false
+							},
+							"Owner": null,
+							"CreateTime": 0,
+							"LastAccessTime": 0,
+							"Retention": 0,
+							"Temporary": false,
+							"IsRewriteEnabled": false,
+							"ViewOriginalText": null,
+							"ViewExpandedText": null,
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"OriginObjectId": null,
+							"IsSharedEntity": false,
+							"PublishStatus": "PUBLISHED",
+							"Properties": {
+								"Description": "",
+								"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
+								"PrimaryKeys": "",
+								"spark.sql.sources.provider": "csv",
+								"spark.sql.sources.schema.numParts": "1",
+								"spark.sql.sources.schema.part.0": "{\"type\":\"struct\",\"fields\":[{\"name\":\"Column_1\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}}]}"
+							},
+							"ObjectVersion": 1,
+							"ObjectId": "0aebf8dd-12df-46a5-be6c-d45b04a6c72f",
+							"Description": ""
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testdb9')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "testdb9",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/testdb9",
+								"Properties": {
+									"FormatType": "csv",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							},
+							"PublishStatus": "PUBLISHED",
+							"ObjectVersion": 1,
+							"ObjectId": "0ae96cce-822a-488b-a399-572192ccd87d"
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sparkpool01')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"autoPause": {
+					"enabled": true,
+					"delayInMinutes": 15
+				},
+				"autoScale": {
+					"enabled": true,
+					"maxNodeCount": 5,
+					"minNodeCount": 3
+				},
+				"nodeCount": 10,
+				"nodeSize": "Small",
+				"nodeSizeFamily": "MemoryOptimized",
+				"sparkVersion": "3.1",
+				"isComputeIsolationEnabled": false,
+				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "westeurope"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/dup01')]",
+			"type": "Microsoft.Synapse/workspaces/databases",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"Ddls": [
+					{
+						"ActionType": "CREATE",
+						"OldEntity": null,
+						"NewEntity": {
+							"Name": "dup01",
+							"EntityType": "DATABASE",
+							"Origin": {
+								"Type": "SPARK"
+							},
+							"Properties": {
+								"IsSyMSCDMDatabase": true
+							},
+							"Source": {
+								"Provider": "ADLS",
+								"Location": "abfss://myspace@chenchrlake06.dfs.core.windows.net/dup01",
+								"Properties": {
+									"FormatType": "parquet",
+									"LinkedServiceName": "chenchr03-WorkspaceDefaultStorage"
+								}
+							}
+						},
+						"Source": {
+							"Type": "SPARK"
+						}
+					}
+				]
+			},
+			"dependsOn": []
+		}
+	]
+}
