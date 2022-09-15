@@ -114,7 +114,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "f7b1ce9c-0f5e-4899-80cc-e4f43566a2d7"
+						"spark.autotune.trackingId": "14d1d626-972e-4d34-a373-bf1557b8a4e9"
 					}
 				},
 				"metadata": {
@@ -134,25 +134,24 @@
 						"endpoint": "https://chenchr03.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpool01",
 						"auth": {
 							"type": "AAD",
-							"authResource": "https://dev.azuresynapse.net",
-							"authHeader": null
+							"authResource": "https://dev.azuresynapse.net"
 						},
 						"sparkVersion": "3.1",
 						"nodeCount": 10,
 						"cores": 4,
 						"memory": 28,
-						"extraHeader": null
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
 				"cells": [
 					{
 						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"# spark.sql(\"CREATE DATABASE IF NOT EXISTS nyctaxi\")\r\n",
 							"spark.sql(\"CREATE DATABASE IF NOT EXISTS testdb2\")"
 						],
-						"attachments": null,
 						"outputs": [],
 						"execution_count": 4
 					},
@@ -174,7 +173,6 @@
 							", header=True\r\n",
 							")"
 						],
-						"attachments": null,
 						"outputs": [],
 						"execution_count": 5
 					},
@@ -194,7 +192,6 @@
 						"source": [
 							"df.write.mode(\"overwrite\").saveAsTable(\"testdb6.trip100_2\")"
 						],
-						"attachments": null,
 						"outputs": [],
 						"execution_count": 6
 					},
@@ -215,7 +212,6 @@
 						"source": [
 							"display(spark.sql(\"select * from nyctaxi.trip100\"))"
 						],
-						"attachments": null,
 						"outputs": [],
 						"execution_count": 8
 					},
@@ -239,9 +235,8 @@
 						"source": [
 							"%%sql\r\n",
 							"\r\n",
-							"show databases"
+							"show databases; "
 						],
-						"attachments": null,
 						"outputs": [],
 						"execution_count": 4
 					},
@@ -261,7 +256,6 @@
 						"source": [
 							""
 						],
-						"attachments": null,
 						"outputs": [],
 						"execution_count": null
 					}
